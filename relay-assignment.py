@@ -100,6 +100,7 @@ def print_assignment(assignment, runners, race):
     print('----+-------{:s}-+--------------------------'.format('-' * (name_w - 6)))
     for i, name in enumerate(assignment):
         leg = race['legs'][i]
+        rank = runners[name]['ranking'].index(i+1)+1
         pace = runners[name]['pace']
         distances = ' + '.join('{:4.1f} mi'.format(i) for i in leg)
         times = ' + '.join('{:3.0f} min'.format(i*pace / 60) for i in leg)
@@ -107,7 +108,7 @@ def print_assignment(assignment, runners, race):
         time = sum(leg) * pace / 60
         pace_str = '{:d}:{:02d}'.format(pace // 60, pace % 60).ljust(5)
         print('{:3d} | {:s} | {:s} = {:4.1f} mi'.format(i+1, name.ljust(name_w), distances, distance))
-        print('    | {:s}{:s} | {:s} = {:3.0f} min'.format(pace_str, ' '*(name_w-5), times, time))
+        print('#{:2d} | {:s}{:s} | {:s} = {:3.0f} min'.format(rank, pace_str, ' '*(name_w-5), times, time))
         if i != len(assignment)-1:
             print('    | {:s} |'.format(' '*name_w))
 
