@@ -40,6 +40,8 @@ def print_assignment(assignment, runners, race):
     print('')
     print('Total distance: {:.1f} mi'.format(total_distance))
     print('Total time: {:.0f} hr {:.0f} min'.format(total_time / 60, total_time % 60))
+    avg_pace = total_time / total_distance
+    print('Average pace: {:d}:{:02d} min/mi'.format(int(avg_pace), int(avg_pace * 60) % 60))
 
 if __name__ == '__main__':
     main(sys.argv[1])
