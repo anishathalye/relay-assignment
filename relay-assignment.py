@@ -96,6 +96,7 @@ def print_assignment(assignment, runners, race):
     '''
     total_time = 0
     total_distance = 0
+    total_rank = 0
 
     name_w = max(max(len(i) for i in runners), 6)
     print('Num | Runner{:s} | Legs'.format(' ' * (name_w - 6)))
@@ -116,12 +117,14 @@ def print_assignment(assignment, runners, race):
 
         total_time += time
         total_distance += distance
+        total_rank += rank
 
     print('')
     print('Total distance: {:.1f} mi'.format(total_distance))
     print('Total time: {:.0f} hr {:.0f} min'.format(total_time / 60, total_time % 60))
     avg_pace = total_time / total_distance
     print('Average pace: {:d}:{:02d} min/mi'.format(int(avg_pace), int(avg_pace * 60) % 60))
+    print('Sum of ranks: {:d}'.format(total_rank))
 
 if __name__ == '__main__':
     main(sys.argv[1])
