@@ -122,7 +122,7 @@ def print_assignment(assignment, runners, race):
 
     print('')
     print('Total distance: {:.1f} mi'.format(total_distance))
-    print('Total time: {:.0f} hr {:.0f} min'.format(total_time / 60, total_time % 60))
+    print('Total time: {:d} hr {:d} min'.format(int(total_time)//60, int(total_time) % 60))
     avg_pace = total_time / total_distance
     print('Average pace: {:d}:{:02d} min/mi'.format(int(avg_pace), int(avg_pace * 60) % 60))
     print('Sum of ranks: {:d}'.format(total_rank))
