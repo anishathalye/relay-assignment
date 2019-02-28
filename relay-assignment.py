@@ -76,7 +76,8 @@ def optimal_assignment(groups, runners, race):
         cost = C_masked[row_ind, col_ind].sum()
         if cost < inf and cost < best_cost:
             best_cost = cost
-            best = [index_to_runner[i] for i in col_ind]
+            best = [{i: index_to_runner[r] for r, i in zip(row_ind, col_ind)}[i] for i in range(N)]
+
     return best
 
 def main(data_path):
