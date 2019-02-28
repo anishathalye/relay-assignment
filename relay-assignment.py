@@ -22,6 +22,8 @@ def optimal_assignment(groups, runners, race):
     # all_group_assignments[_][i] = j ==> group i is in race group j
 
     all_group_assignments = [()]
+    if groups is None:
+        groups = []
     for i in range(len(groups)):
         all_group_assignments = [(i,) + e for e in all_group_assignments for i in range(len(race['groups']))]
 
