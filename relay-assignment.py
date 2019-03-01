@@ -82,7 +82,28 @@ def optimal_assignment(groups, runners, race):
     return best
 
 
-def print_assignment(assignment, runners, race):
+def greedy_by_pace_assignment(groups, runners, race):
+    available = set(range(len(race['legs'])))
+    assignment = {}
+    for name, r in sorted(runners.items(), key=lambda i: i[1]['pace']):
+        for pref in r['ranking']:
+            if pref-1 in available:
+                assignment[pref-1] = name
+                available.remove(pref-1)
+                break
+    return [assignment[i] for i in range(len(race['legs']))]
+
+
+def greedy_by_time_assignment(groups, runners, race):
+    available = set(range(len(race['legs'])))
+    assignment = {}
+    runners_by_pace = sorted(runners.items(), key=lambda i: i[1]['pace'])
+    matching = zip(runners_by_pace, sorted(enumerate(race['legs']), key=lambda i: sum(i[1]), reverse=True))
+    assignment = {i[1][0]: i[0][0] for i in matching}
+    return [assignment[i] for i in range(len(race['legs']))]
+
+
+def print_assignment(assignment, runners, race, only_summary=False):
     '''
     Nicely formats and prints an assignment of runners to legs of a race.
 
@@ -93,8 +114,9 @@ def print_assignment(assignment, runners, race):
     total_rank = 0
 
     name_w = max(max(len(i) for i in runners), 6)
-    print('Num | Runner{:s} | Legs'.format(' ' * (name_w - 6)))
-    print('----+-------{:s}-+--------------------------'.format('-' * (name_w - 6)))
+    if not only_summary:
+        print('Num | Runner{:s} | Legs'.format(' ' * (name_w - 6)))
+        print('----+-------{:s}-+--------------------------'.format('-' * (name_w - 6)))
     for i, name in enumerate(assignment):
         leg = race['legs'][i]
         rank = runners[name]['ranking'].index(i+1)+1
@@ -104,17 +126,19 @@ def print_assignment(assignment, runners, race):
         distance = sum(leg)
         time = sum(leg) * pace / 60
         pace_str = '{:d}:{:02d}'.format(pace // 60, pace % 60).ljust(5)
-        print('{:3d} | {:s} | {:s} = {:4.1f} mi'.format(i+1, name.ljust(name_w), distances, distance))
-        print('#{:2d} | {:s}{:s} | {:s} = {:3.0f} min'.format(rank, pace_str, ' '*(name_w-5), times, time))
-        if i != len(assignment)-1:
-            print('    | {:s} |'.format(' '*name_w))
+        if not only_summary:
+            print('{:3d} | {:s} | {:s} = {:4.1f} mi'.format(i+1, name.ljust(name_w), distances, distance))
+            print('#{:2d} | {:s}{:s} | {:s} = {:3.0f} min'.format(rank, pace_str, ' '*(name_w-5), times, time))
+            if i != len(assignment)-1:
+                print('    | {:s} |'.format(' '*name_w))
 
         total_time += time
         total_distance += distance
         total_rank += rank
 
-    print('')
-    print('Total distance: {:.1f} mi'.format(total_distance))
+    if not only_summary:
+        print('')
+        print('Total distance: {:.1f} mi'.format(total_distance))
     print('Total time: {:d} hr {:d} min'.format(int(total_time)//60, int(total_time) % 60))
     avg_pace = total_time / total_distance
     print('Average pace: {:d}:{:02d} min/mi'.format(int(avg_pace), int(avg_pace * 60) % 60))
@@ -127,8 +151,12 @@ def main(data_path):
     groups = data['groups']
     runners = data['runners']
     race = data['race']
-    assignment = optimal_assignment(groups, runners, race)
-    print_assignment(assignment, runners, race)
+    print('=== Minimum Time ===\n')
+    print_assignment(greedy_by_time_assignment(groups, runners, race), runners, race, only_summary=True)
+    print('\n=== Greedy by Pace ===\n')
+    print_assignment(greedy_by_pace_assignment(groups, runners, race), runners, race, only_summary=True)
+    print('\n=== Optimal ===\n')
+    print_assignment(optimal_assignment(groups, runners, race), runners, race)
 
 
 if __name__ == '__main__':
