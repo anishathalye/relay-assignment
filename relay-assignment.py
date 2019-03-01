@@ -5,6 +5,7 @@ import numpy as np
 import scipy.optimize
 import sys
 
+
 def optimal_assignment(groups, runners, race):
     '''
     Constructs an optimal assignment as follows:
@@ -80,14 +81,6 @@ def optimal_assignment(groups, runners, race):
 
     return best
 
-def main(data_path):
-    with open(data_path) as f:
-        data = yaml.load(f)
-    groups = data['groups']
-    runners = data['runners']
-    race = data['race']
-    assignment = optimal_assignment(groups, runners, race)
-    print_assignment(assignment, runners, race)
 
 def print_assignment(assignment, runners, race):
     '''
@@ -126,6 +119,17 @@ def print_assignment(assignment, runners, race):
     avg_pace = total_time / total_distance
     print('Average pace: {:d}:{:02d} min/mi'.format(int(avg_pace), int(avg_pace * 60) % 60))
     print('Sum of ranks: {:d}'.format(total_rank))
+
+
+def main(data_path):
+    with open(data_path) as f:
+        data = yaml.load(f)
+    groups = data['groups']
+    runners = data['runners']
+    race = data['race']
+    assignment = optimal_assignment(groups, runners, race)
+    print_assignment(assignment, runners, race)
+
 
 if __name__ == '__main__':
     main(sys.argv[1])
