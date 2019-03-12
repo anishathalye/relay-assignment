@@ -6,6 +6,37 @@ import scipy.optimize
 import sys
 
 
+class DisjointSet:
+    def __init__(self):
+        self._leader = {}
+        self._group = {}
+
+    def add(self, elem):
+        if self._leader.get(elem) is None:
+            self._leader[elem] = elem
+            self._group[elem] = {elem}
+
+    def merge(self, a, b):
+        la = self._leader[a]
+        lb = self._leader[b]
+        if la is None or lb is None:
+            raise ValueError('must be added to set first')
+        ga = self._group[la]
+        gb = self._group[lb]
+        if len(ga) < len(gb):
+            a, la, ga, b, lb, gb = b, lb, gb, a, la, ga
+        ga |= gb
+        del self._group[lb]
+        for elem in gb:
+            self._leader[elem] = la
+
+    def group(self, elem):
+        return self._group[self._leader[elem]]
+
+    def groups(self):
+        return [list(self._group[i]) for i in self._leader if self._leader[i] == i]
+
+
 def optimal_assignment(groups, runners, race):
     '''
     Constructs an optimal assignment as follows:
@@ -17,6 +48,16 @@ def optimal_assignment(groups, runners, race):
     assignments to groups of the race and then using the Hungarian algorithm in
     the inner loop.
     '''
+
+    # merge overlaps in groups
+
+    ds = DisjointSet()
+    for r in runners:
+        ds.add(r)
+    for group in groups:
+        for elem in group[1:]:
+            ds.merge(group[0], elem)
+    groups = [i for i in ds.groups() if len(i) > 1]
 
     # list all possible group assignments
     #

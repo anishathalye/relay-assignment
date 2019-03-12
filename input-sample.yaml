@@ -4,6 +4,7 @@ groups:
   - [A, B, C]
   - [D, K]
   - [H, I]
+  - [C, D]
 runners:
   # runners ranking is a permutation of leg numbers, from most preferred to
   # least preferred
