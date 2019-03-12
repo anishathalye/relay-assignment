@@ -112,7 +112,7 @@ def optimal_assignment(groups, runners, race):
             ok = race['groups'][possibility[ig]]
             for mem in g:
                 for i in range(N):
-                    if i not in ok:
+                    if i+1 not in ok:
                         C_masked[runner_to_index[mem]][i] = inf
         row_ind, col_ind = scipy.optimize.linear_sum_assignment(C_masked)
         cost = C_masked[row_ind, col_ind].sum()
