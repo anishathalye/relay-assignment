@@ -66,9 +66,10 @@ def optimal_assignment(groups, runners, race):
     ds = DisjointSet()
     for r in runners:
         ds.add(r)
-    for group in groups:
-        for elem in group[1:]:
-            ds.merge(group[0], elem)
+    if groups:
+        for group in groups:
+            for elem in group[1:]:
+                ds.merge(group[0], elem)
     groups = [i for i in ds.groups() if len(i) > 1]
 
     # list all possible group assignments
