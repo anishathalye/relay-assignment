@@ -23,10 +23,10 @@ class DisjointSet:
     def merge(self, a, b):
         la = self._leader[a]
         lb = self._leader[b]
-        if la == lb:
-            return
         if la is None or lb is None:
             raise ValueError('must be added to set first')
+        if la == lb:
+            return
         ga = self._group[la]
         gb = self._group[lb]
         if len(ga) < len(gb):
