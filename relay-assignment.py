@@ -6,6 +6,10 @@ import scipy.optimize
 import sys
 
 
+MILES_PER_KM = 0.621371
+BENCHMARK_PACE_DISTANCE = 10*MILES_PER_KM
+
+
 class DisjointSet:
     def __init__(self):
         self._leader = {}
@@ -35,6 +39,14 @@ class DisjointSet:
 
     def groups(self):
         return [list(self._group[i]) for i in self._leader if self._leader[i] == i]
+
+
+def estimate_time(benchmark_pace, distance):
+    # The prediction is based on the formula developed by Pete Riegel and
+    # published first in a slightly different form in Runner's World, August
+    # 1977.
+    benchmark_time = benchmark_pace * BENCHMARK_PACE_DISTANCE
+    return benchmark_time * (distance / BENCHMARK_PACE_DISTANCE)**1.06
 
 
 def optimal_assignment(groups, runners, race):
@@ -83,7 +95,7 @@ def optimal_assignment(groups, runners, race):
     def rank(r, i):
         return runners[index_to_runner[r]]['ranking'].index(i+1)
     def time(r, i):
-        return int(runners[index_to_runner[r]]['pace'] * sum(race['legs'][i]))
+        return sum(estimate_time(runners[index_to_runner[r]]['pace'], d) for d in race['legs'][i])
     symbolic_C = [
         [
             (rank(r, i), time(r, i)) for i in range(N)
@@ -163,13 +175,14 @@ def print_assignment(assignment, runners, race, only_summary=False):
         rank = runners[name]['ranking'].index(i+1)+1
         pace = runners[name]['pace']
         distances = ' + '.join('{:4.1f} mi'.format(i) for i in leg)
-        times = ' + '.join('{:3.0f} min'.format(i*pace / 60) for i in leg)
+        times = [estimate_time(pace, d) / 60 for d in leg]
+        stimes = ' + '.join('{:3.0f} min'.format(i) for i in times)
         distance = sum(leg)
-        time = sum(leg) * pace / 60
+        time = sum(times)
         pace_str = '{:d}:{:02d}'.format(pace // 60, pace % 60).ljust(5)
         if not only_summary:
             print('{:3d} | {:s} | {:s} = {:4.1f} mi'.format(i+1, name.ljust(name_w), distances, distance))
-            print('#{:2d} | {:s}{:s} | {:s} = {:3.0f} min'.format(rank, pace_str, ' '*(name_w-5), times, time))
+            print('#{:2d} | {:s}{:s} | {:s} = {:3.0f} min'.format(rank, pace_str, ' '*(name_w-5), stimes, time))
             if i != len(assignment)-1:
                 print('    | {:s} |'.format(' '*name_w))
 
